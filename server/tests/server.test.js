@@ -4,24 +4,9 @@ const {ObjectID} = require('mongodb');
 
 var {app} = require('./../server')
 var {Todo} = require('./../models/todo');
+const {todos,populateTodos} = require('./seed/seed');
 
-const todos = [{
-  _id: new ObjectID(),
-  text: 'First test todo!',
-  completed:false,
-  completedAt:null
-},{
-  _id: new ObjectID(),
-  text: 'Second test todo',
-  completed: true,
-  completedAt: 333
-}];
-
-beforeEach((done) => {
-  Todo.remove({}).then(()=>{
-    return Todo.insertMany(todos);
-  }).then(() => done());
-});
+beforeEach(populateTodos);
 
 describe('POST /todos', () => {
 
