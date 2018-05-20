@@ -3,9 +3,11 @@ const request = require('supertest');
 const {ObjectID} = require('mongodb');
 
 var {app} = require('./../server')
-var {Todo} = require('./../models/todo');
-const {todos,populateTodos} = require('./seed/seed');
+const {Todo} = require('./../models/todo');
+const {User} = require('./../models/user');
+const {todos,populateTodos,users,populateUsers} = require('./seed/seed');
 
+beforeEach(populateUsers);
 beforeEach(populateTodos);
 
 describe('POST /todos', () => {
@@ -16,6 +18,7 @@ describe('POST /todos', () => {
     request(app)
       .post('/todos')
       .send({text})
+      .set('x-auth',users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
         expect(res.body.text).toBe(text);
@@ -35,6 +38,7 @@ describe('POST /todos', () => {
     it('should not create todo with invalid body data !',(done) => {
       request(app)
         .post('/todos')
+        .set('x-auth',users[0].tokens[0].token)
         .send({})
         .expect(400)
         .end((err,res) => {
@@ -55,9 +59,10 @@ describe('POST /todos', () => {
     it('should get all todos', (done) => {
       request(app)
         .get('/todos')
+        .set('x-auth', users[0].tokens[0].token)
         .expect(200)
         .expect((res) => {
-          expect(res.body.todos.length).toBe(2);
+          expect(res.body.todos.length).toBe(1);
         })
         .end(done);
     });
